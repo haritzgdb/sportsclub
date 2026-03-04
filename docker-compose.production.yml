@@ -1,23 +1,37 @@
 services:
-  # Sobrescribimos la configuración de la base de datos
+  # Base de Datos: Cerramos puertos al exterior y añadimos persistencia/reinicio
   postgres:
-    ports: !reset [] # ELIMINA la exposición del puerto 5432 al exterior
-    restart: always  # Se reinicia si el servidor se reinicia
+    ports: !reset [] # Borra el mapeo de puertos del archivo base
+    restart: always  # Reinicio automático
     env_file:
       - .env.production
-  app-blue:
-    ports: !reset [] # Asegura que la app no exponga puertos al host, solo vía NGINX
-    restart: always
-    environment:
-      - DEBUG=False  # Forzamos modo producción
 
-  app-green:
-    ports: !reset []
+  # Aplicación Blue: Usamos la imagen de Docker Hub en lugar de construir localmente
+  app-blue:
+    image: haritzgdb/sportsclub:latest # Imagen del registro
+    build: !reset {}                   # Anula la instrucción build del archivo base
+    ports: !reset []                   # Solo accesible vía NGINX
     restart: always
+    env_file:
+      - .env.production
     environment:
       - DEBUG=False
+      - DEPLOYMENT_COLOR=blue
 
+  # Aplicación Green: Igual que Blue, compartiendo la misma imagen endurecida
+  app-green:
+    image: haritzgdb/sportsclub:latest
+    build: !reset {}
+    ports: !reset []
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      - DEBUG=False
+      - DEPLOYMENT_COLOR=green
+
+  # NGINX: Única puerta de entrada al sistema
   nginx:
     ports:
-      - "80:80"      # En producción usamos el puerto estándar 80
-    restart: always
+      - "80:80"      # Puerto estándar de producción
+      - "8000:80"
