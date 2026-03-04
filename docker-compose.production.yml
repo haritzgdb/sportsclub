@@ -1,0 +1,23 @@
+services:
+  # Sobrescribimos la configuración de la base de datos
+  postgres:
+    ports: !reset [] # ELIMINA la exposición del puerto 5432 al exterior
+    restart: always  # Se reinicia si el servidor se reinicia
+    env_file:
+      - .env.production
+  app-blue:
+    ports: !reset [] # Asegura que la app no exponga puertos al host, solo vía NGINX
+    restart: always
+    environment:
+      - DEBUG=False  # Forzamos modo producción
+
+  app-green:
+    ports: !reset []
+    restart: always
+    environment:
+      - DEBUG=False
+
+  nginx:
+    ports:
+      - "80:80"      # En producción usamos el puerto estándar 80
+    restart: always
