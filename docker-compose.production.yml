@@ -1,0 +1,25 @@
+services:
+  # Base de Datos: Cerramos puertos al exterior y añadimos persistencia/reinicio
+  postgres:
+    ports: !reset [] # Borra el mapeo de puertos del archivo base
+    restart: always  # Reinicio automático
+
+  # Aplicación Blue: Usamos la imagen de Docker Hub en lugar de construir localmente
+  app-blue:
+    restart: always
+    environment:
+      - DEBUG=False
+      - DEPLOYMENT_COLOR=blue
+
+  # Aplicación Green: Igual que Blue, compartiendo la misma imagen endurecida
+  app-green:
+    restart: always
+    environment:
+      - DEBUG=False
+      - DEPLOYMENT_COLOR=green
+
+  # NGINX: Única puerta de entrada al sistema
+  nginx:
+    restart: always
+    ports:
+      - "80:80"      # Puerto estándar de producción
