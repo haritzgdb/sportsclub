@@ -1,7 +1,6 @@
 # core/models/enums.py
 from enum import StrEnum
 
-
 class Discipline(StrEnum):
     """Athletic disciplines tracked in competitions."""
 
